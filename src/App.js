@@ -99,7 +99,7 @@ function App() {
 
     const updatedProduct = buildNewCartItem(foundProduct);
 
-    setCartItems((prevState) => [...prevState.cartItems, updatedProduct])
+    setCartItems((prevState) => [...prevState, updatedProduct])
 
   }
 
