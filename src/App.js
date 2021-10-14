@@ -1,26 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
 import NewProduct from "./pages/NewProduct";
 
-// import * as api from "./api";
+import * as api from "./api";
 
-// const LOCAL_STORAGE_KEY = "react-sc-state";
+const LOCAL_STORAGE_KEY = "react-sc-state";
 
-// function loadLocalStorageData() {
-//   const prevItems = localStorage.getItem(LOCAL_STORAGE_KEY);
+function loadLocalStorageData() {
+  const prevItems = localStorage.getItem(LOCAL_STORAGE_KEY);
 
-//   if (!prevItems) {
-//     return null;
-//   }
+  if (!prevItems) {
+    return null;
+  }
 
-//   try {
-//     return JSON.parse(prevItems);
-//   } catch (error) {
-//     return null;
-//   }
-// }
+  try {
+    return JSON.parse(prevItems);
+  } catch (error) {
+    return null;
+  }
+}
 
 function buildNewCartItem(cartItem) {
   if (cartItem.quantity >= cartItem.unitsInStock) {
@@ -43,36 +43,34 @@ function buildNewCartItem(cartItem) {
 function App() {
   const [products, setProducts] = useState([])
   const [cartItems, setCartItems] = useState([])
-  // const [isLoading, setIsLoading] = useState(false)
-  // const [hasError, setHasError] = useState(false)
-  // const [loadingError, setLoadingError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [hasError, setHasError] = useState(false)
+  const [loadingError, setLoadingError] = useState(null)
 
 
+  useEffect(() => {
+    const prevItems = loadLocalStorageData();
 
-  // componentDidMount() {
-  //   const prevItems = loadLocalStorageData();
+    if (!prevItems) {
+      setIsLoading(true)
 
-  //   if (!prevItems) {
-  //     setIsLoading(true)
+      api.getProducts().then((data) => {
+        setProducts(data)
+        setIsLoading(false)
+      });
+      return;
+    }
 
-  //     api.getProducts().then((data) => {
-  //       setProducts(data)
-  //       setIsLoading(false)
-  //     });
-  //     return;
-  //   }
+    setCartItems(prevItems.cartItems)
+    setProducts(prevItems.products)
+  }, [])
 
-  //   setCartItems(prevItems.cartItems)
-  //   setProducts(prevItems.products)
-
-  // }
-
-  // componentDidUpdate() {
-  //   localStorage.setItem(
-  //     LOCAL_STORAGE_KEY,
-  //     JSON.stringify({ cartItems, products }),
-  //   );
-  // }
+  useEffect(() => {
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify({ cartItems, products }),
+    );
+  }, [cartItems, products])
 
   const handleAddToCart = (productId) => {
 
@@ -212,9 +210,9 @@ function App() {
             fullWidth
             cartItems={cartItems}
             products={products}
-            // isLoading={isLoading}
-            // hasError={hasError}
-            // loadingError={loadingError}
+            isLoading={isLoading}
+            hasError={hasError}
+            loadingError={loadingError}
             handleDownVote={handleDownVote}
             handleUpVote={handleUpVote}
             handleSetFavorite={handleSetFavorite}
